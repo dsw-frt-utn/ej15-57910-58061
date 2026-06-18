@@ -39,9 +39,9 @@ public class PersistenceInMemory : IPersistence
         return Specialities.FirstOrDefault(s => s.Id == id);
     }
 
-    private void LoadSpecialities()
+    private async void LoadSpecialities()
     {
-        var json = File.ReadAllText("specialities.json");
+        var json = await File.ReadAllTextAsync("specialities.json");
         Specialities = JsonSerializer.Deserialize<List<Speciality>>(json, new JsonSerializerOptions
         {
             PropertyNameCaseInsensitive = true
