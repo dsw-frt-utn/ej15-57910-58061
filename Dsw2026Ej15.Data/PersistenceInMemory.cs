@@ -5,44 +5,47 @@ using System.Text.Json;
 
 public class PersistenceInMemory : IPersistence
 {
-    public List<Doctor>? Doctors { get; set; }
-    private List<Speciality>? Specialities { get; set; }
+    private List<Doctor> _doctors = [];
+    private List<Speciality> _specialities = [];
     public PersistenceInMemory()
     {
-        Doctors = new List<Doctor>();
-        Specialities = new List<Speciality>();
         LoadSpecialities();
     }
-    public void AddDoctor(Doctor doctor)
+    public async Task AddDoctor(Doctor doctor)
     {
-        Doctors.Add(doctor);
+        _doctors.Add(doctor);
     }
-    public void DeleteDoctor(Guid idDoctor)
+    public async Task DeleteDoctor(Guid idDoctor)
     {
-        var doctor = GetDoctor(idDoctor);
+        var doctor = await GetDoctorById(idDoctor);
         if (doctor != null)
         {
-            doctor.IsActive = false;
+            doctor.desactivate();
         }
     }
-    public Doctor GetDoctor(Guid idDoctor)
+    public async Task<Doctor?> GetDoctorById(Guid idDoctor)
     {
-        return Doctors.FirstOrDefault(d => d.Id == idDoctor);
+        return _doctors.FirstOrDefault(d => d.Id == idDoctor);
     }
-    public List<Doctor> GetAllDoctor()
+    public async Task <IEnumerable<Doctor>> GetAllDoctor()
     {
-        return Doctors.Where(d => d.IsActive).ToList();
+        return _doctors.Where(d => d.IsActive).ToList();
     }
 
-    public Speciality? GetSpecialityById(Guid id)
+    public async Task<Speciality?> GetSpecialityById(Guid id)
     {
-        return Specialities.FirstOrDefault(s => s.Id == id);
+        return _specialities.FirstOrDefault(s => s.Id == id);
+    }
+    public async Task UpdateDoctor(Doctor doctor)
+    {
+        _doctors.Remove(doctor);
+        _doctors.Add(doctor);
     }
 
     private async void LoadSpecialities()
     {
         var json = await File.ReadAllTextAsync("specialities.json");
-        Specialities = JsonSerializer.Deserialize<List<Speciality>>(json, new JsonSerializerOptions
+        _specialities = JsonSerializer.Deserialize<List<Speciality>>(json, new JsonSerializerOptions
         {
             PropertyNameCaseInsensitive = true
         });

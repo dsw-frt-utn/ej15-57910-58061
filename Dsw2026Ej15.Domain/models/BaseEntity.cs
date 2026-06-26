@@ -6,7 +6,11 @@ namespace Dsw2026Ej15.Domain.models
 {
     public abstract class BaseEntity 
     {
-        public Guid Id { get; set; }
+        public BaseEntity(Guid? id=null)
+        {
+            Id = id;
+        }
+        public Guid? Id { get; set; }
         
     }
 }
